@@ -194,7 +194,12 @@ extern int printf(const char *, ...);
 #endif
 
 /* force GCC to generate only one epilog at the end of the function */
+#if defined(__i386__) || defined(__x86_64__)
+/* Also add 4 bytes of padding so that we can replace the ret with a jmp.  */
+#define FORCE_RET() __asm__ __volatile__ ("nop;nop;nop;nop" : : : "memory");
+#else
 #define FORCE_RET() __asm__ __volatile__("" : : : "memory");
+#endif
 
 #ifndef OPPROTO
 #define OPPROTO
@@ -251,11 +256,11 @@ extern int __op_jmp0, __op_jmp1, __op_jmp2, __op_jmp3;
 #endif
 
 #if defined(__i386__)
-#define EXIT_TB() asm volatile ("ret")
-#define GOTO_LABEL_PARAM(n) asm volatile ("jmp " ASM_NAME(__op_gen_label) #n)
+#define EXIT_TB() asm volatile ("hlt")
+#define GOTO_LABEL_PARAM(n) asm volatile ("cli;.long " ASM_NAME(__op_gen_label) #n " - 1f;1:")
 #elif defined(__x86_64__)
-#define EXIT_TB() asm volatile ("ret")
-#define GOTO_LABEL_PARAM(n) asm volatile ("jmp " ASM_NAME(__op_gen_label) #n)
+#define EXIT_TB() asm volatile ("hlt")
+#define GOTO_LABEL_PARAM(n) asm volatile ("cli;.long " ASM_NAME(__op_gen_label) #n " - 1f;1:")
 #elif defined(__powerpc__)
 #define EXIT_TB() asm volatile ("blr")
 #define GOTO_LABEL_PARAM(n) asm volatile ("b " ASM_NAME(__op_gen_label) #n)

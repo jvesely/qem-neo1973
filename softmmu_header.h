@@ -117,7 +117,7 @@ static inline RES_TYPE glue(glue(ld, USUFFIX), MEMSUFFIX)(target_ulong ptr)
                   "m" (*(uint32_t *)offsetof(CPUState, tlb_table[CPU_MMU_INDEX][0].addr_read)),
                   "i" (CPU_MMU_INDEX),
                   "m" (*(uint8_t *)&glue(glue(__ld, SUFFIX), MMUSUFFIX))
-                  : "%eax", "%ecx", "%edx", "memory", "cc");
+                  : "%eax", "%edx", "memory", "cc");
     return res;
 }
 
@@ -164,13 +164,14 @@ static inline int glue(glue(lds, SUFFIX), MEMSUFFIX)(target_ulong ptr)
                   "m" (*(uint32_t *)offsetof(CPUState, tlb_table[CPU_MMU_INDEX][0].addr_read)),
                   "i" (CPU_MMU_INDEX),
                   "m" (*(uint8_t *)&glue(glue(__ld, SUFFIX), MMUSUFFIX))
-                  : "%eax", "%ecx", "%edx", "memory", "cc");
+                  : "%eax", "%edx", "memory", "cc");
     return res;
 }
 #endif
 
-static inline void glue(glue(st, SUFFIX), MEMSUFFIX)(target_ulong ptr, RES_TYPE v)
+static inline void glue(glue(st, SUFFIX), MEMSUFFIX)(target_ulong ptr, RES_TYPE val)
 {
+    RES_TYPE v = val;
     asm volatile ("movl %0, %%edx\n"
                   "movl %0, %%eax\n"
                   "shrl %3, %%edx\n"
@@ -207,11 +208,9 @@ static inline void glue(glue(st, SUFFIX), MEMSUFFIX)(target_ulong ptr, RES_TYPE 
                   "2:\n"
                   :
                   : "r" (ptr),
-#if DATA_SIZE == 1
-                  "q" (v),
-#else
+/* NOTE: 'q' would be needed as constraint, but we could not use it
+   with T1 ! */
                   "r" (v),
-#endif
                   "i" ((CPU_TLB_SIZE - 1) << CPU_TLB_ENTRY_BITS),
                   "i" (TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS),
                   "i" (TARGET_PAGE_MASK | (DATA_SIZE - 1)),

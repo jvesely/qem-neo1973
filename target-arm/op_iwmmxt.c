@@ -170,9 +170,16 @@ void OPPROTO op_iwmmxt_adduq_M0_wRn(void)
     M0 += M1;
 }
 
+#if defined(__i386__) && __GNUC__ >= 4
+#define RegCopy(d, s) __builtin_memcpy(&(d), &(s), sizeof(d))
+#endif
+#ifndef RegCopy
+#define RegCopy(d, s) d = s
+#endif
+
 void OPPROTO op_iwmmxt_movq_wRn_M0(void)
 {
-    M1 = M0;
+    RegCopy (M1, M0);
 }
 
 void OPPROTO op_iwmmxt_movl_wCx_T0(void)
