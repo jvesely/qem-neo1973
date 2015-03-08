@@ -49,6 +49,7 @@
 #endif
 #ifdef __linux__
 #include <sys/ioctl.h>
+#include <signal.h>
 #include <linux/cdrom.h>
 #include <linux/fd.h>
 #endif
