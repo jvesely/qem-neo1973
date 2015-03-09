@@ -874,7 +874,8 @@ static int init_directories(BDRVVVFATState* s,
     {
 	direntry_t* entry=array_get_next(&(s->directory));
 	entry->attributes=0x28; /* archive | volume label */
-	snprintf((char*)entry->name,11,"QEMU VVFAT");
+	snprintf((char*)entry->name,8,"QEMU VVFAT");
+	snprintf((char*)entry->name,3,"QEMU VVFAT");
     }
 
     /* Now build FAT, and write back information into directory */
