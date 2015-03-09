@@ -9,9 +9,9 @@ qemu="$src_dir/$qemu_relative"
 flash_base=openmoko-flash.base
 flash_image=openmoko-flash.image
 make=make
-which gmake && make=gmake
+which gmake 2> /dev/null >&2 && make=gmake
 echo=echo
-which gecho && echo=gecho
+which gecho 2> /dev/null >&2 && echo=gecho
 export make echo
 dump_dir="$script_dir/vvfat"
 
