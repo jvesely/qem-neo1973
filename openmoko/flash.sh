@@ -44,7 +44,7 @@ ${make} splash.gz || exit -1
 most_recent () {
 	cd $src_dir
 	export $2="`basename \`ls -d -1 $img_dir/$1 | sort -n | tail -n 1\``"
-	export $3="`python -c \"import os; print '0x%lx' \
+	export $3="`python2 -c \"import os; print '0x%lx' \
 		%(os.stat('$img_dir/${!2}').st_size)\"`"
 	cd $script_dir
 	[ -e "${!2}" ] || ln -sf $img_dir/${!2} ${!2}
